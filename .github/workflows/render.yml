@@ -20,9 +20,13 @@ jobs:
         run: |
           gdown "1R6-hVg-1Ymbu25YWdJtbDXhA2_kfHNFm" -O base_video.mp4
 
+      - name: Fix MP3 Loop Gap (Convert to WAV)
+        run: |
+          ffmpeg -i gufQa0sE.mp3 -c:a pcm_s16le clean_audio.wav
+
       - name: Start Rendering 1080p Video (Guardian's Magic Tweaks)
         run: |
-          ffmpeg -stream_loop -1 -i base_video.mp4 -stream_loop -1 -i gufQa0sE.mp3 \
+          ffmpeg -stream_loop -1 -i base_video.mp4 -stream_loop -1 -i clean_audio.wav \
           -vf "scale=1920:1080,eq=brightness=-0.04:saturation=0.95,vignette=PI/4" \
           -af "afade=t=in:ss=0:d=5,afade=t=out:st=7190:d=10" \
           -c:v libx264 -preset veryfast -crf 23 \
@@ -37,4 +41,3 @@ jobs:
         with:
           name: Ready-Sleep-Video
           path: final_cabin_sleep_2h_1080p.mp4
-          
