@@ -1,1 +1,40 @@
+name: Automated 1080p Sleep Video Render
 
+on: [workflow_dispatch]
+
+jobs:
+  render_video:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Install FFmpeg & Download Tool
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg
+          pip install gdown
+
+      - name: Download Video from Google Drive
+        run: |
+          gdown "1R6-hVg-1Ymbu25YWdJtbDXhA2_kfHNFm" -O base_video.mp4
+
+      - name: Start Rendering 1080p Video (Guardian's Magic Tweaks)
+        run: |
+          ffmpeg -stream_loop -1 -i base_video.mp4 -stream_loop -1 -i gufQa0sE.mp3 \
+          -vf "scale=1920:1080,eq=brightness=-0.04:saturation=0.95,vignette=PI/4" \
+          -af "afade=t=in:ss=0:d=5,afade=t=out:st=7190:d=10" \
+          -c:v libx264 -preset veryfast -crf 23 \
+          -c:a aac -b:a 192k -shortest -t 02:00:00 \
+          -metadata title="Cozy Forest Cabin Rain Sounds for Deep Sleep | 2 Hours Rainstorm ASMR" \
+          -metadata artist="Deep Sleep Ambiance" \
+          -metadata genre="Ambient White Noise" \
+          -movflags +faststart final_cabin_sleep_2h_1080p.mp4
+
+      - name: Upload Final Video for Download
+        uses: actions/upload-artifact@v4
+        with:
+          name: Ready-Sleep-Video
+          path: final_cabin_sleep_2h_1080p.mp4
+          
