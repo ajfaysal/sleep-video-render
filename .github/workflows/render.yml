@@ -1,4 +1,4 @@
-name: Automated 1080p Sleep Video Render
+name: Automated 1080p Sleep Video Render (Ultra Pro Audio)
 
 on: [workflow_dispatch]
 
@@ -18,16 +18,15 @@ jobs:
 
       - name: Download Files from Google Drive
         run: |
-          gdown "1R6-hVg-1Ymbu25YWdJtbDXhA2_kfHNFm" -O base_video.mp4
+          gdown "1j7uWcGJygDXSWoponxO6utqtCI_Vtk-e" -O rendered_video_2h.mp4
           gdown "1RqOdaltZqC-VpktJgmyPmLCRoBe4kpwt" -O new_audio.mp3
 
-      - name: Start Rendering 1080p Video (Audio Clean & Loop)
+      - name: Apply 3D Spatial Audio & Loudness Normalization
         run: |
-          ffmpeg -stream_loop -1 -i base_video.mp4 -i new_audio.mp3 \
-          -vf "scale=1920:1080,eq=brightness=-0.04:saturation=0.95,vignette=PI/4" \
-          -af "highpass=f=250,lowshelf=f=450:g=-12,highshelf=f=3500:g=5,afade=t=in:ss=0:d=5,afade=t=out:st=7180:d=10" \
-          -c:v libx264 -preset veryfast -crf 23 \
-          -c:a aac -b:a 192k -shortest -t 02:00:00 \
+          ffmpeg -i rendered_video_2h.mp4 -i new_audio.mp3 \
+          -map 0:v -map 1:a -c:v copy \
+          -af "highpass=f=250,lowshelf=f=450:g=-12,highshelf=f=3500:g=5,extrastereo=m=2.5:c=c,loudnorm=I=-16:TP=-1.5:LRA=11,afade=t=in:ss=0:d=5,afade=t=out:st=7180:d=10" \
+          -c:a aac -b:a 256k -shortest -t 02:00:00 \
           -metadata title="Cozy Forest Cabin Rain Sounds for Deep Sleep | 2 Hours Rainstorm ASMR" \
           -metadata artist="LofiMellow HQ" \
           -metadata genre="Ambient White Noise" \
