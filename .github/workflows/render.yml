@@ -1,4 +1,4 @@
-name: Automated 1080p Sleep Video Render (Safe Audio Swap)
+name: Automated 1080p Sleep Video Render (95 Percent Noise Reduction)
 
 on: [workflow_dispatch]
 
@@ -21,11 +21,11 @@ jobs:
           gdown "1j7uWcGJygDXSWoponxO6utqtCI_Vtk-e" -O rendered_video_2h.mp4
           gdown "1RqOdaltZqC-VpktJgmyPmLCRoBe4kpwt" -O new_audio.mp3
 
-      - name: Fast Audio Swap & Audio Clean
+      - name: Aggressive High-Low Filter for Pure Raindrops
         run: |
           ffmpeg -i rendered_video_2h.mp4 -i new_audio.mp3 \
           -map 0:v -map 1:a -c:v copy \
-          -af "highpass=f=250,lowshelf=f=450:g=-12,highshelf=f=3500:g=5,afade=t=in:ss=0:d=5,afade=t=out:st=7180:d=10" \
+          -af "highpass=f=350,lowpass=f=1800,lowshelf=f=400:g=-20,highshelf=f=1800:g=-18,volume=1.5,afade=t=in:ss=0:d=5,afade=t=out:st=7180:d=10" \
           -c:a aac -b:a 256k -shortest -t 02:00:00 \
           -metadata title="Cozy Forest Cabin Rain Sounds for Deep Sleep | 2 Hours Rainstorm ASMR" \
           -metadata artist="LofiMellow HQ" \
