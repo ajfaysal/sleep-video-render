@@ -16,23 +16,20 @@ jobs:
           sudo apt-get install -y ffmpeg
           pip install gdown
 
-      - name: Download Video from Google Drive
+      - name: Download Files from Google Drive
         run: |
           gdown "1R6-hVg-1Ymbu25YWdJtbDXhA2_kfHNFm" -O base_video.mp4
+          gdown "1RqOdaltZqC-VpktJgmyPmLCRoBe4kpwt" -O new_audio.mp3
 
-      - name: Fix MP3 Loop Gap (Convert to WAV)
+      - name: Start Rendering 1080p Video (Audio Clean & Loop)
         run: |
-          ffmpeg -i gufQa0sE.mp3 -c:a pcm_s16le clean_audio.wav
-
-      - name: Start Rendering 1080p Video (Guardian's Magic Tweaks)
-        run: |
-          ffmpeg -stream_loop -1 -i base_video.mp4 -stream_loop -1 -i clean_audio.wav \
+          ffmpeg -stream_loop -1 -i base_video.mp4 -i new_audio.mp3 \
           -vf "scale=1920:1080,eq=brightness=-0.04:saturation=0.95,vignette=PI/4" \
-          -af "afade=t=in:ss=0:d=5,afade=t=out:st=7190:d=10" \
+          -af "highpass=f=250,lowshelf=f=450:g=-12,highshelf=f=3500:g=5,afade=t=in:ss=0:d=5,afade=t=out:st=7180:d=10" \
           -c:v libx264 -preset veryfast -crf 23 \
           -c:a aac -b:a 192k -shortest -t 02:00:00 \
           -metadata title="Cozy Forest Cabin Rain Sounds for Deep Sleep | 2 Hours Rainstorm ASMR" \
-          -metadata artist="Deep Sleep Ambiance" \
+          -metadata artist="LofiMellow HQ" \
           -metadata genre="Ambient White Noise" \
           -movflags +faststart final_cabin_sleep_2h_1080p.mp4
 
