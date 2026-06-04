@@ -1,0 +1,38 @@
+name: Ultimate 2H Seamless Lofi Render (LofiMellow HQ)
+
+on: [workflow_dispatch]
+
+jobs:
+  render_premium_lofi:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Install FFmpeg & Tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg
+          pip install gdown
+
+      - name: Download Raw Assets from Google Drive
+        run: |
+          gdown "118KR9u2IxU00Ph-cqKkY0p8bjEWMnJgx" -O raw_ai_music.mp4
+          gdown "1BS4zjj4_r2AFDbn6ntB6McQoDeAITCf7" -O premium_cafe_visual.mp4
+
+      - name: Process 2-Hour Audio and Unique Video Stream
+        run: |
+          ffmpeg -i raw_ai_music.mp4 -vn -c:a copy extracted_audio.aac -y
+          
+          ffmpeg -stream_loop -1 -i premium_cafe_visual.mp4 -i extracted_audio.aac \
+          -map 0:v -map 1:a \
+          -vf "eq=contrast=1.02:brightness=0.01:saturation=1.03,scale=1920:1080,format=yuv420p" \
+          -c:v libx264 -preset slow -crf 17 -b:v 5000k -maxrate 5500k -bufsize 10000k \
+          -c:a copy -movflags +faststart -shortest -t 02:00:00 final_lofi_master_2h.mp4
+
+      - name: Upload Premium 2-Hour File
+        uses: actions/upload-artifact@v4
+        with:
+          name: LofiMellow-HQ-FantasyCafe-2H
+          path: final_lofi_master_2h.mp4
