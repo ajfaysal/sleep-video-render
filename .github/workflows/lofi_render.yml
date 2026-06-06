@@ -42,9 +42,3 @@ jobs:
         with:
           name: 2-Hour-Lofi-Video-Pro
           path: final_lofi_2hours_pro.mp4
-          
-      - name: Upload Final Masterpiece
-        uses: actions/upload-artifact@v3
-        with:
-          name: 2-Hour-Lofi-Video-Pro
-          path: final_lofi_2hours_pro.mp4
