@@ -9,13 +9,13 @@ jobs:
 
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up Python & Install gdown
         run: |
           sudo apt-get update
           sudo apt-get install -y python3-pip
-          pip3 install gdown
+          pip3 install gdown --break-system-packages
 
       - name: Install FFmpeg
         run: |
@@ -23,21 +23,26 @@ jobs:
 
       - name: Download Video from Google Drive
         run: |
-          # Downloading the 1 minute 17 seconds input video from Google Drive
+          # Downloading the input video from Google Drive
           gdown "1KOosP8daDFNaPvLTsVVqvtJIrNyR5sIm" -O input_video.mp4
 
       - name: Render Seamless Loop (Max Quality + Zero Lag + UVA)
         run: |
           # -stream_loop -1: Creates an infinite loop of the input video.
-          # delogo: Removes the Veo watermark by blurring it with the background.
+          # delogo: Removes the Veo watermark by blurring it.
           # unsharp: Enhances video quality and sharpness.
-          # drawtext: Adds a real-time study clock (Unique Value Addition for monetization).
-          # -vsync 1 -async 1: Syncs audio and video frames strictly to prevent any stutter, freeze, or visual flash at loop joints.
-          # -crf 18 & 320k: Ensures maximum visual and audio quality.
+          # drawtext: Adds a real-time study clock.
+          # -vsync 1 -async 1: Syncs audio and video frames.
           ffmpeg -stream_loop -1 -i input_video.mp4 \
           -vf "delogo=x=1150:y=650:w=120:h=60, unsharp=5:5:0.5:5:5:0.0, drawtext=text='%{pts\:hms}': x=w-180: y=h-80: fontsize=36: fontcolor=white@0.6: box=1: boxcolor=black@0.3: boxborderw=10" \
           -c:v libx264 -preset fast -crf 18 -c:a aac -b:a 320k -ar 48000 -vsync 1 -async 1 -t 02:00:00 final_lofi_2hours_pro.mp4
 
+      - name: Upload Final Masterpiece
+        uses: actions/upload-artifact@v4
+        with:
+          name: 2-Hour-Lofi-Video-Pro
+          path: final_lofi_2hours_pro.mp4
+          
       - name: Upload Final Masterpiece
         uses: actions/upload-artifact@v3
         with:
