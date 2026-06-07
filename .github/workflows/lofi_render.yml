@@ -1,4 +1,4 @@
-name: Render Seamless 2-Hour Lofi Pro
+name: Render Seamless 2-Hour Lofi Fast
 
 on:
   workflow_dispatch:
@@ -26,19 +26,18 @@ jobs:
           # Downloading the input video from Google Drive
           gdown "1KOosP8daDFNaPvLTsVVqvtJIrNyR5sIm" -O input_video.mp4
 
-      - name: Render Seamless Loop (Max Quality + Zero Lag + UVA)
+      - name: Render Seamless Loop (UltraFast + Zero Lag + UVA)
         run: |
-          # -stream_loop -1: Creates an infinite loop of the input video.
-          # delogo: Removes the Veo watermark by blurring it.
-          # unsharp: Enhances video quality and sharpness.
-          # drawtext: Adds a real-time study clock.
-          # -vsync 1 -async 1: Syncs audio and video frames.
+          # Removed heavy unsharp filter to boost speed.
+          # Changed preset to 'ultrafast' to force GitHub servers to render at maximum speed.
+          # Changed crf to 23 (standard quality) to reduce rendering load.
           ffmpeg -stream_loop -1 -i input_video.mp4 \
-          -vf "delogo=x=1150:y=650:w=120:h=60, unsharp=5:5:0.5:5:5:0.0, drawtext=text='%{pts\:hms}': x=w-180: y=h-80: fontsize=36: fontcolor=white@0.6: box=1: boxcolor=black@0.3: boxborderw=10" \
-          -c:v libx264 -preset fast -crf 18 -c:a aac -b:a 320k -ar 48000 -vsync 1 -async 1 -t 02:00:00 final_lofi_2hours_pro.mp4
+          -vf "delogo=x=1150:y=650:w=120:h=60, drawtext=text='%{pts\:hms}': x=w-180: y=h-80: fontsize=36: fontcolor=white@0.6: box=1: boxcolor=black@0.3: boxborderw=10" \
+          -c:v libx264 -preset ultrafast -crf 23 -c:a aac -b:a 192k -ar 48000 -vsync 1 -async 1 -t 02:00:00 final_lofi_2hours_fast.mp4
 
       - name: Upload Final Masterpiece
         uses: actions/upload-artifact@v4
         with:
-          name: 2-Hour-Lofi-Video-Pro
-          path: final_lofi_2hours_pro.mp4
+          name: 2-Hour-Lofi-Video-Fast
+          path: final_lofi_2hours_fast.mp4
+          
