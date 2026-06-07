@@ -1,4 +1,4 @@
-name: Render Seamless 2-Hour Lofi Fast
+name: Bulletproof 2-Hour Lofi
 
 on:
   workflow_dispatch:
@@ -11,33 +11,33 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Set up Python & Install gdown
+      - name: Install FFmpeg & gdown
         run: |
           sudo apt-get update
-          sudo apt-get install -y python3-pip
+          sudo apt-get install -y python3-pip ffmpeg
           pip3 install gdown --break-system-packages
-
-      - name: Install FFmpeg
-        run: |
-          sudo apt-get install -y ffmpeg
 
       - name: Download Video from Google Drive
         run: |
-          # Downloading the input video from Google Drive
           gdown "1KOosP8daDFNaPvLTsVVqvtJIrNyR5sIm" -O input_video.mp4
 
-      - name: Render Seamless Loop (UltraFast + Zero Lag + UVA)
+      - name: Create Concat List (The Ultimate Fix for Stutter/Dhakka)
         run: |
-          # Removed heavy unsharp filter to boost speed.
-          # Changed preset to 'ultrafast' to force GitHub servers to render at maximum speed.
-          # Changed crf to 23 (standard quality) to reduce rendering load.
-          ffmpeg -stream_loop -1 -i input_video.mp4 \
-          -vf "delogo=x=1150:y=650:w=120:h=60, drawtext=text='%{pts\:hms}': x=w-180: y=h-80: fontsize=36: fontcolor=white@0.6: box=1: boxcolor=black@0.3: boxborderw=10" \
-          -c:v libx264 -preset ultrafast -crf 23 -c:a aac -b:a 192k -ar 48000 -vsync 1 -async 1 -t 02:00:00 final_lofi_2hours_fast.mp4
+          # Creating a list of 100 loops to ensure a smooth, continuous flow without using buggy stream_loop
+          rm -f loop.txt
+          for i in {1..100}; do echo "file 'input_video.mp4'" >> loop.txt; done
+
+      - name: Render Seamless Loop & Hide Watermark with Timer
+        run: |
+          # -f concat: Perfectly stitches the video without any lag, pause, or flash.
+          # drawtext: Places a solid black box (boxcolor=black@1.0) with a timer EXACTLY over the Veo watermark to hide it completely.
+          ffmpeg -f concat -safe 0 -i loop.txt \
+          -vf "drawtext=text='%{pts\:hms}': x=w-280: y=h-120: fontsize=65: fontcolor=white: box=1: boxcolor=black@1.0: boxborderw=25" \
+          -c:v libx264 -preset ultrafast -crf 23 -c:a aac -b:a 192k -ar 48000 -t 02:00:00 final_lofi_2hours.mp4
 
       - name: Upload Final Masterpiece
         uses: actions/upload-artifact@v4
         with:
-          name: 2-Hour-Lofi-Video-Fast
-          path: final_lofi_2hours_fast.mp4
+          name: Final-Lofi-Video
+          path: final_lofi_2hours.mp4
           
