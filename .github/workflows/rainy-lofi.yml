@@ -26,22 +26,20 @@ jobs:
 
       - name: Generate Seamless Video List
         run: |
-          # Loop the 1-minute video 130 times to exceed 2 hours seamlessly without stream_loop bugs
+          # Loop the 1-minute video 130 times
           rm -f video_loop.txt
           for i in {1..130}; do echo "file 'input_video.mp4'" >> video_loop.txt; done
 
-      - name: Render Unique 2-Hour Video (No Stutter + Monetization Safe)
+      - name: Render Unique 2-Hour Video (100% Original Audio)
         run: |
-          # -f concat: Stitches video frames perfectly with zero lag, zero flashes at joints.
-          # eq filter: Modifies brightness, contrast, and saturation to alter the pixel hash completely, bypassing "Reused Content".
-          # drawtext: Adds a beautiful translucent Study Timer as real human value addition for YouTube monetization approval.
-          # -map 0:v:0 -map 1:a:0 -shortest: Binds the looped video to the exact duration of your 2-hour audio file.
+          # Changed audio codec to '-c:a copy' to keep the EXACT original AI audio quality without any loss.
           ffmpeg -f concat -safe 0 -i video_loop.txt -i input_audio.mp3 \
           -vf "eq=brightness=-0.02:contrast=1.06:saturation=1.15, drawtext=text='%{pts\:hms}': x=w-280: y=h-120: fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf: fontsize=65: fontcolor=white: box=1: boxcolor=black@0.65: boxborderw=25" \
-          -c:v libx264 -preset ultrafast -crf 23 -c:a aac -b:a 192k -ar 48000 -map 0:v:0 -map 1:a:0 -shortest final_unique_lofi_2hours.mp4
+          -c:v libx264 -preset ultrafast -crf 23 -c:a copy -map 0:v:0 -map 1:a:0 -shortest final_unique_lofi_2hours.mp4
 
       - name: Upload Master Video Artifact
         uses: actions/upload-artifact@v4
         with:
           name: Premium-2Hour-Rainy-Lofi
           path: final_unique_lofi_2hours.mp4
+          
