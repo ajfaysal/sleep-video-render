@@ -1,0 +1,48 @@
+name: Ultimate 2-Hour Unique Lofi Renderer
+
+on:
+  workflow_dispatch:
+
+jobs:
+  render_process:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Install Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg fonts-dejavu python3-pip
+          pip3 install gdown --break-system-packages
+
+      - name: Download Raw Assets from Google Drive
+        run: |
+          # Downloading 1-minute Pixabay Video
+          gdown "1tzJQ5TS9jGUOA-9ZgieKI3GGSKuXgP2A" -O input_video.mp4
+          # Downloading 2-hour AI Master Audio
+          gdown "1RVN76f7jHE1bkyPZntA6r8sKALvwK4xh" -O input_audio.mp3
+
+      - name: Generate Seamless Video List
+        run: |
+          # Loop the 1-minute video 130 times to exceed 2 hours seamlessly without stream_loop bugs
+          rm -f video_loop.txt
+          for i in {1..130}; do echo "file 'input_video.mp4'" >> video_loop.txt; done
+
+      - name: Render Unique 2-Hour Video (No Stutter + Monetization Safe)
+        run: |
+          # -f concat: Stitches video frames perfectly with zero lag, zero flashes at joints.
+          # eq filter: Modifies brightness, contrast, and saturation to alter the pixel hash completely, bypassing "Reused Content".
+          # drawtext: Adds a beautiful translucent Study Timer as real human value addition for YouTube monetization approval.
+          # -map 0:v:0 -map 1:a:0 -shortest: Binds the looped video to the exact duration of your 2-hour audio file.
+          ffmpeg -f concat -safe 0 -i video_loop.txt -i input_audio.mp3 \
+          -vf "eq=brightness=-0.02:contrast=1.06:saturation=1.15, drawtext=text='%{pts\:hms}': x=w-280: y=h-120: fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf: fontsize=65: fontcolor=white: box=1: boxcolor=black@0.65: boxborderw=25" \
+          -c:v libx264 -preset ultrafast -crf 23 -c:a aac -b:a 192k -ar 48000 -map 0:v:0 -map 1:a:0 -shortest final_unique_lofi_2hours.mp4
+
+      - name: Upload Master Video Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Premium-2Hour-Rainy-Lofi
+          path: final_unique_lofi_2hours.mp4
+          
