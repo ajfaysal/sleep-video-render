@@ -17,10 +17,11 @@ jobs:
         sudo apt-get install -y ffmpeg
         pip install gdown
 
-    - name: Download Files via gdown (Bypass Google Drive Warning)
+    - name: Download Files via gdown
       run: |
-        gdown --id 1NriLSr4CShR2ncqsVswwC2qd7BmI5P37 -O raw_input_video.mp4
-        gdown --id 1bVVXhnr6XBEqJ1IsVK2UJbK19b0ab4Db -O raw_input_audio.mp3
+        # Using full URL in quotes to bypass the --id syntax error
+        gdown "https://drive.google.com/uc?id=1NriLSr4CShR2ncqsVswwC2qd7BmI5P37" -O raw_input_video.mp4
+        gdown "https://drive.google.com/uc?id=1bVVXhnr6XBEqJ1IsVK2UJbK19b0ab4Db" -O raw_input_audio.mp3
 
     - name: Strip Original Audio, Crop Watermark & Reset Video Metadata
       run: |
@@ -45,4 +46,3 @@ jobs:
         name: Monetized-Ready-Lofi-Video
         path: final_lofi_2h_master.mp4
         retention-days: 3
-        
