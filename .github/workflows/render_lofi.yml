@@ -11,15 +11,16 @@ jobs:
     - name: Checkout Repository
       uses: actions/checkout@v4
 
-    - name: Install FFmpeg & Wget
+    - name: Install FFmpeg & gdown
       run: |
         sudo apt-get update
-        sudo apt-get install -y ffmpeg wget
+        sudo apt-get install -y ffmpeg
+        pip install gdown
 
-    - name: Download Files Directly From Google Drive
+    - name: Download Files via gdown (Bypass Google Drive Warning)
       run: |
-        wget --no-check-certificate 'https://docs.google.com/uc?export=download&id=1NriLSr4CShR2ncqsVswwC2qd7BmI5P37' -O raw_input_video.mp4
-        wget --no-check-certificate 'https://docs.google.com/uc?export=download&id=1bVVXhnr6XBEqJ1IsVK2UJbK19b0ab4Db' -O raw_input_audio.mp3
+        gdown --id 1NriLSr4CShR2ncqsVswwC2qd7BmI5P37 -O raw_input_video.mp4
+        gdown --id 1bVVXhnr6XBEqJ1IsVK2UJbK19b0ab4Db -O raw_input_audio.mp3
 
     - name: Strip Original Audio, Crop Watermark & Reset Video Metadata
       run: |
@@ -44,3 +45,4 @@ jobs:
         name: Monetized-Ready-Lofi-Video
         path: final_lofi_2h_master.mp4
         retention-days: 3
+        
