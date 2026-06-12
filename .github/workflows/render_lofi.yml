@@ -1,0 +1,46 @@
+name: Ultimate Safe 2-Hour Lofi Render
+
+on:
+  workflow_dispatch:
+
+jobs:
+  render:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+
+    - name: Install FFmpeg & Wget
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y ffmpeg wget
+
+    - name: Download Files Directly From Google Drive
+      run: |
+        wget --no-check-certificate 'https://docs.google.com/uc?export=download&id=1NriLSr4CShR2ncqsVswwC2qd7BmI5P37' -O raw_input_video.mp4
+        wget --no-check-certificate 'https://docs.google.com/uc?export=download&id=1bVVXhnr6XBEqJ1IsVK2UJbK19b0ab4Db' -O raw_input_audio.mp3
+
+    - name: Strip Original Audio, Crop Watermark & Reset Video Metadata
+      run: |
+        ffmpeg -i raw_input_video.mp4 -vf "crop=in_w-42:in_h-42:0:0,scale=1920:1080,eq=saturation=1.04:contrast=1.02" -an -c:v libx264 -pix_fmt yuv420p clean_base_video.mp4
+
+    - name: Generate Direct Concat Loop (Zero Flash / Zero Jumps)
+      run: |
+        for i in {1..720}; do echo "file 'clean_base_video.mp4'" >> file_list.txt; done
+        ffmpeg -f concat -safe 0 -i file_list.txt -c copy looped_video_only.mp4
+
+    - name: Break Audio Invisible Watermark & Master Remix
+      run: |
+        ffmpeg -i raw_input_audio.mp3 -af "bass=g=0.6,treble=g=-0.4" -c:a mp3 -b:a 320k safe_master_audio.mp3
+
+    - name: Final High-Value Merge
+      run: |
+        ffmpeg -i looped_video_only.mp4 -i safe_master_audio.mp3 -c:v copy -c:a copy -shortest final_lofi_2h_master.mp4
+
+    - name: Upload 2-Hour Monetization Ready Video
+      uses: actions/upload-artifact@v4
+      with:
+        name: Monetized-Ready-Lofi-Video
+        path: final_lofi_2h_master.mp4
+        retention-days: 3
