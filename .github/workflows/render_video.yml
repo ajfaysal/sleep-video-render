@@ -1,0 +1,42 @@
+name: Final Render Lofi Video
+on:
+  workflow_dispatch:
+
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y ffmpeg
+        pip install gdown
+
+    - name: Download files
+      run: |
+        gdown "1KriHZxMscGE3Q_QIJyjpVb6zXniI1AhX" -O video.mp4
+        gdown "1qFNB5c_YYolV_b97Ljrv-eTeUe7GeyIa" -O audio.mp3
+
+    - name: Render 2-Hour Video
+      run: |
+        ffmpeg -stream_loop -1 -i video.mp4 -i audio.mp3 \
+          -filter_complex "[0:v]crop=iw:ih-65:0:0,scale=1920:1080[vout]" \
+          -map "[vout]" -map 1:a \
+          -c:v libx264 -preset fast -crf 14 -pix_fmt yuv420p \
+          -c:a aac -b:a 320k -shortest \
+          -metadata title="LofiMellow HQ Study Session" \
+          -metadata artist="LofiMellow HQ" \
+          -metadata comment="Original lofi music for study and focus" \
+          -metadata year="2026" \
+          final.mp4
+
+    - name: Upload result
+      uses: actions/upload-artifact@v3
+      with:
+        name: Lofi-Final-Masterpiece
+        path: final.mp4
+        retention-days: 1
