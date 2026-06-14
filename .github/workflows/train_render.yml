@@ -25,20 +25,21 @@ jobs:
     - name: Render 2-Hour Video with Volume Mix
       run: |
         ffmpeg -stream_loop -1 -an -i video.mp4 -i lofi_main.mp3 -i rain_heavy.mp3 \
-          -filter_complex "[0:v]crop=iw:ih-65:0:0,scale=1920:1080[vout]; [1:a]volume=2.0[a1]; [2:a]volume=0.6[a2]; [a1][a2]amix=inputs=2:duration=shortest[aout]" \
+          -filter_complex "[0:v]crop=iw:ih-65:0:0,scale=1920:1080[vout]; [1:a]volume=2.0[a1]; [2:a]volume=0.6[a2]; [a1][a2]amix=inputs=2:duration=first[aout]" \
           -map "[vout]" -map "[aout]" \
+          -t 02:00:00 \
           -c:v libx264 -preset fast -crf 14 -pix_fmt yuv420p \
-          -c:a aac -b:a 320k -shortest \
+          -c:a aac -b:a 320k \
           -metadata title="Late Night Train Ride - Neon City Rain" \
           -metadata artist="LofiMellow HQ" \
           -metadata comment="Original lofi music with ambient rain for study and focus" \
           -metadata year="2026" \
-          final_train_masterpiece.mp4
+          Late_Night_Train_Ride_Neon_City_Lofi_LofiMellow_HQ.mp4
 
     - name: Upload result
       uses: actions/upload-artifact@v4
       with:
         name: Lofi-Train-Final
-        path: final_train_masterpiece.mp4
+        path: Late_Night_Train_Ride_Neon_City_Lofi_LofiMellow_HQ.mp4
         retention-days: 1
         
