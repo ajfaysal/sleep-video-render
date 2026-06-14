@@ -1,0 +1,44 @@
+name: Render Train Lofi Video
+on:
+  workflow_dispatch:
+
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y ffmpeg
+        pip install gdown
+
+    - name: Download media files
+      run: |
+        gdown "1p1QU6xk9AdyOa-sL75RXYDtXiIbBkeD5" -O video.mp4
+        gdown "1n1RtcTqVvQD6tJ2sxSYjxqfs_axDjoYj" -O lofi_main.mp3
+        gdown "12pIAOKix6mL7Zwy-zSEFgMGblEACsDcb" -O rain_heavy.mp3
+
+    - name: Render 2-Hour Video with Volume Mix
+      run: |
+        ffmpeg -stream_loop -1 -an -i video.mp4 -i lofi_main.mp3 -i rain_heavy.mp3 \
+          -filter_complex "[0:v]crop=iw:ih-65:0:0,scale=1920:1080[vout]; [1:a]volume=2.0[a1]; [2:a]volume=0.6[a2]; [a1][a2]amix=inputs=2:duration=shortest[aout]" \
+          -map "[vout]" -map "[aout]" \
+          -c:v libx264 -preset fast -crf 14 -pix_fmt yuv420p \
+          -c:a aac -b:a 320k -shortest \
+          -metadata title="Late Night Train Ride - Neon City Rain" \
+          -metadata artist="LofiMellow HQ" \
+          -metadata comment="Original lofi music with ambient rain for study and focus" \
+          -metadata year="2026" \
+          final_train_masterpiece.mp4
+
+    - name: Upload result
+      uses: actions/upload-artifact@v4
+      with:
+        name: Lofi-Train-Final
+        path: final_train_masterpiece.mp4
+        retention-days: 1
+        
