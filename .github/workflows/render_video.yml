@@ -8,7 +8,7 @@ jobs:
     timeout-minutes: 360
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: Install dependencies
       run: |
@@ -35,8 +35,9 @@ jobs:
           final.mp4
 
     - name: Upload result
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: Lofi-Final-Masterpiece
         path: final.mp4
         retention-days: 1
+        
