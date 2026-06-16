@@ -19,11 +19,11 @@ jobs:
 
       - name: Download Video from Google Drive
         run: |
-          gdown --id 1sjgS2hc0kxC3IQpFp6Q1M08HXPoLBkmj -O video.mp4
+          gdown "https://drive.google.com/uc?id=1sjgS2hc0kxC3IQpFp6Q1M08HXPoLBkmj" -O video.mp4
 
       - name: Download Audio from Google Drive
         run: |
-          gdown --id 16Dti7PUemEg-nuZYAIAx57kJbXLNF_bt -O audio.mp3
+          gdown "https://drive.google.com/uc?id=16Dti7PUemEg-nuZYAIAx57kJbXLNF_bt" -O audio.mp3
 
       - name: Render Seamless 2-Hour Video (Remove Watermark & Sync Audio)
         run: |
