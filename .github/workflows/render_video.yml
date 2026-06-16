@@ -1,43 +1,37 @@
-name: Final Render Lofi Video
+name: LofiMellow HQ Studio Render
+
 on:
   workflow_dispatch:
 
 jobs:
-  render:
+  render-masterpiece:
     runs-on: ubuntu-latest
-    timeout-minutes: 360
 
     steps:
-    - uses: actions/checkout@v4
+      - name: Checkout Repository
+        uses: actions/checkout@v4
 
-    - name: Install dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y ffmpeg
-        pip install gdown
+      - name: Install Dependencies (FFmpeg & gdown)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg
+          pip install gdown
 
-    - name: Download files
-      run: |
-        gdown "1KriHZxMscGE3Q_QIJyjpVb6zXniI1AhX" -O video.mp4
-        gdown "1qFNB5c_YYolV_b97Ljrv-eTeUe7GeyIa" -O audio.mp3
+      - name: Download Video from Google Drive
+        run: |
+          gdown 1sjgS2hc0kxC3IQpFp6Q1M08HXPoLBkmj -O video.mp4
 
-    - name: Render 2-Hour Video
-      run: |
-        ffmpeg -stream_loop -1 -i video.mp4 -i audio.mp3 \
-          -filter_complex "[0:v]crop=iw:ih-65:0:0,scale=1920:1080[vout]" \
-          -map "[vout]" -map 1:a \
-          -c:v libx264 -preset fast -crf 14 -pix_fmt yuv420p \
-          -c:a aac -b:a 320k -shortest \
-          -metadata title="LofiMellow HQ Study Session" \
-          -metadata artist="LofiMellow HQ" \
-          -metadata comment="Original lofi music for study and focus" \
-          -metadata year="2026" \
-          final.mp4
+      - name: Download Audio from Google Drive
+        run: |
+          gdown 16Dti7PUemEg-nuZYAIAx57kJbXLNF_bt -O audio.mp3
 
-    - name: Upload result
-      uses: actions/upload-artifact@v4
-      with:
-        name: Lofi-Final-Masterpiece
-        path: final.mp4
-        retention-days: 1
-        
+      - name: Render Seamless 2-Hour Video (Remove Watermark & Sync Audio)
+        run: |
+          ffmpeg -stream_loop -1 -i video.mp4 -i audio.mp3 -filter_complex "[0:v]crop=iw*0.92:ih*0.92:0:0,scale=1920:1080[v]" -map "[v]" -map 1:a -c:v libx264 -preset fast -crf 18 -c:a aac -b:a 320k -shortest -y LofiMellow_HQ_Final.mp4
+
+      - name: Upload Final Masterpiece
+        uses: actions/upload-artifact@v4
+        with:
+          name: LofiMellow_HQ_Final_Render
+          path: LofiMellow_HQ_Final.mp4
+          
