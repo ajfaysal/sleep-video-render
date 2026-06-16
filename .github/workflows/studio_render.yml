@@ -29,8 +29,11 @@ jobs:
         run: |
           ffmpeg -stream_loop -1 -i video.mp4 -i audio.mp3 -filter_complex "[0:v]crop=iw*0.92:ih*0.92:0:0,scale=1920:1080[v]" -map "[v]" -map 1:a -c:v libx264 -preset fast -crf 18 -c:a aac -b:a 320k -shortest -y LofiMellow_HQ_Final.mp4
 
-      - name: Upload Final Masterpiece
-        uses: actions/upload-artifact@v4
+      - name: Upload to Google Drive
+        uses: adityak74/google-drive-upload-action@main
         with:
-          name: LofiMellow_HQ_Final_Render
-          path: LofiMellow_HQ_Final.mp4
+          credentials: ${{ secrets.DRIVE_CREDENTIALS }}
+          filename: "LofiMellow_HQ_Final.mp4"
+          folderId: ${{ secrets.DRIVE_FOLDER_ID }}
+          overwrite: "true"
+          
