@@ -1,7 +1,7 @@
 name: Lofi Video Render
 
 on:
-  workflow_dispatch: # Allows manual trigger from the GitHub Actions tab
+  workflow_dispatch:
 
 jobs:
   render_video:
@@ -34,11 +34,10 @@ jobs:
             -map 1:a \
             -c:v libx264 \
             -preset ultrafast \
-            -crf 20 \
+            -crf 18 \
             -r 30 \
             -pix_fmt yuv420p \
-            -c:a aac -b:a 192k \
-            -ar 48000 \
+            -c:a copy \
             -shortest \
             -metadata title="Cozy Thunderstorm Cabin Lofi" \
             -metadata artist="LofiMellow HQ" \
