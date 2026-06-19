@@ -25,7 +25,7 @@ jobs:
 
       - name: Render Premium Video with Seamless Audio
         run: |
-          echo "Starting 2-hour premium render..."
+          echo "Starting exactly 2-hour premium render..."
           ffmpeg -y \
             -stream_loop -1 -i input_video.mp4 \
             -i input_audio.mp3 \
@@ -39,7 +39,7 @@ jobs:
             -pix_fmt yuv420p \
             -c:a aac \
             -b:a 320k \
-            -shortest \
+            -t 02:00:00 \
             -metadata title="Premium Thunderstorm Cabin Lofi" \
             -metadata artist="LofiMellow HQ" \
             -metadata copyright="2026 LofiMellow HQ" \
@@ -51,4 +51,3 @@ jobs:
         with:
           name: LofiMellow-Premium-Video
           path: Premium_Lofi_Final.mp4
-          
