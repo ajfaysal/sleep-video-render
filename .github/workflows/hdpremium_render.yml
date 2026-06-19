@@ -1,0 +1,54 @@
+name: Premium Lofi Video Render
+
+on:
+  workflow_dispatch: 
+
+jobs:
+  render_video:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install FFmpeg and gdown
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg
+          pipx install gdown
+
+      - name: Download Video and Audio
+        run: |
+          echo "Downloading files from Google Drive..."
+          gdown "1EN3GPSpg-dtTkiAEliiLHvz9SDRPZwjx" -O input_video.mp4
+          gdown "1nDZnEVl4YS_AwTOagpisbWdoB5gQKIRH" -O input_audio.mp3
+
+      - name: Render Premium Video with Seamless Audio
+        run: |
+          echo "Starting 2-hour premium render..."
+          ffmpeg -y \
+            -stream_loop -1 -i input_video.mp4 \
+            -i input_audio.mp3 \
+            -filter_complex "[0:v]scale=1920:1080,setpts=PTS-STARTPTS[v];[1:a]silenceremove=stop_periods=-1:stop_duration=0.3:stop_threshold=-45dB[a]" \
+            -map "[v]" \
+            -map "[a]" \
+            -c:v libx264 \
+            -preset ultrafast \
+            -crf 17 \
+            -r 30 \
+            -pix_fmt yuv420p \
+            -c:a aac \
+            -b:a 320k \
+            -shortest \
+            -metadata title="Premium Thunderstorm Cabin Lofi" \
+            -metadata artist="LofiMellow HQ" \
+            -metadata copyright="2026 LofiMellow HQ" \
+            -movflags +faststart \
+            Premium_Lofi_Final.mp4
+
+      - name: Upload Rendered Video
+        uses: actions/upload-artifact@v4
+        with:
+          name: LofiMellow-Premium-Video
+          path: Premium_Lofi_Final.mp4
+          
